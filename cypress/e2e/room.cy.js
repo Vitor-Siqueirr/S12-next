@@ -13,7 +13,7 @@ describe("rooms specs", () => {
       cy.getDataTestId("calendar-data")
         .invoke("attr", "data-value")
         .then((dataValue) => {
-          cy.getDataTestId("select-room").select(3);
+          cy.getDataTestId("select-room").select("2");
           cy.url().should("include", "/rooms/2");
           cy.getDataTestId("select-room").should("have.value", 2);
 

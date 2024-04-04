@@ -36,7 +36,8 @@ export default function StudentsId({ reservations, students, id }) {
         <select
           value={selectedStudentId}
           onChange={handleChangeStudent}
-          data-testid="select-room">
+          data-testid="select-room"
+          className={cx.selectRoom}>
           {students.map((student) => (
             <option key={student.id} value={student.id}>
               {student.name}
@@ -45,7 +46,7 @@ export default function StudentsId({ reservations, students, id }) {
         </select>
       </div>
 
-      <div>
+      <div className={cx.calendarContainer}>
         <Calendar
           entries={studentEntries}
           data-value={studentEntries}

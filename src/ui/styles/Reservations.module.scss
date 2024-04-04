@@ -7,3 +7,22 @@
 .calendarContainer {
   margin-top: 20px;
 }
+
+.selectRoom {
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.25rem;
+  background-color: var(--primaryColor);
+  box-shadow: 0px 0px 4px 2px #6e6e6e60 inset;
+}
+
+.selectRoom:focus {
+  box-shadow: 0px 0px 4px 1px #6e6e6e60;
+}
+
+.selectRoom option {
+  font-weight: 600;
+}

@@ -34,7 +34,8 @@ export default function RoomsId({ reservations, rooms, id }) {
         <select
           value={id}
           onChange={handleChangeRoom}
-          data-testid="select-room">
+          data-testid="select-room"
+          className={cx.selectRoom}>
           {rooms.map((room) => (
             <option key={room.id} value={room.id}>
               {room.number} - {room.name}

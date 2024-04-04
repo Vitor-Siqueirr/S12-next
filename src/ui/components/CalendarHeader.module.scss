@@ -1,6 +1,7 @@
 @mixin cellBorder {
   border-bottom: 1px solid gray;
   border-left: 1px solid gray;
+  border-radius: 0.5rem 0.5rem 0 0;
 }
 
 .calendarTopLeftCorner {
@@ -11,9 +12,13 @@
 }
 
 .timeMarker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   grid-column: 1;
   padding: 5px;
   @include cellBorder();
+  border-radius: 0;
 }
 
 .weekday {
@@ -23,5 +28,8 @@
   background-color: var(--primaryColor);
   padding: 5px;
   border-top: 1px solid gray;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   @include cellBorder();
 }

@@ -11,7 +11,10 @@ export const InventoryItem = ({ item }) => {
   return (
     <li
       className={cx.container}
-      style={{ backgroundColor: displayableWear(wear).color }}
+      style={{
+        backgroundColor: displayableWear(wear).color,
+        boxShadow: `0px 0px 8px 2px ${displayableWear(wear).color}`,
+      }}
       data-testid="inventory-list">
       <dl>
         <h3 className={cx.title} data-testid="item-title">

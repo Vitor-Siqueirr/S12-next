@@ -6,10 +6,13 @@
   background-color: var(--primaryColor);
   z-index: 1000;
   position: relative;
+  box-shadow: 0px 2px 4px 1px #6e6e6e60;
 }
 
 .title {
   margin-left: 40px;
+  transition: all 0.3s;
+  padding: 0 0.25rem;
 }
 
 .navbar {
@@ -22,5 +25,14 @@
 
 .navbarListItem {
   margin-left: 20px;
+  padding: 0.25rem;
   cursor: pointer;
+  transition: all 0.3s;
+}
+
+.navbarListItem:hover,
+.title:hover {
+  border-radius: 0.25rem;
+  background-color: #c0dbff;
+  box-shadow: 0px 0px 4px 1px #c0dbff;
 }
