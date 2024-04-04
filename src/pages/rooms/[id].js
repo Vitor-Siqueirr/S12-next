@@ -1,41 +1,27 @@
 import { filterReservationsByRoom } from "@/domain/filterReservationsByRoom";
 import { Calendar } from "@/ui/components/Calendar";
 import { useRouter } from "next/router";
-import cx from "./Rooms.module.scss";
-import { fetchReservations } from "@/infrastructure/inner/fetchReservations";
-import { uniqBy } from "lodash";
-import { useEffect } from "react";
+import cx from "@/ui/styles/Reservations.module.scss";
+import {
+  fetchReservations,
+  fetchRooms,
+} from "@/infrastructure/inner/fetchReservations";
+import { mapReservationsToCalendarEntries } from "@/utils/mapReservations";
 
-export default function RoomsId({ reservations, rooms }) {
+export default function RoomsId({ reservations, rooms, id }) {
   const router = useRouter();
-  const { id } = router.query;
 
   const selectedRoomId = Number(id);
   const selectedRoom = rooms.find((room) => room.id === selectedRoomId);
-
-  useEffect(() => {
-    if (!selectedRoom) {
-      const firstRoomId = rooms[0].id;
-      router.push(`/rooms/${firstRoomId}`);
-    }
-  }, [rooms, selectedRoom, router]);
-
-  if (!selectedRoom) {
-    return <>Loading...</>;
-  }
 
   const selectedRoomReservations = filterReservationsByRoom(
     reservations,
     selectedRoom
   );
 
-  const calendarEntries = selectedRoomReservations.map((reservation) => ({
-    id: reservation.id,
-    title: reservation.student.name,
-    dateStart: reservation.startDate,
-    dateEnd: reservation.endDate,
-    group: reservation.id,
-  }));
+  const calendarEntries = mapReservationsToCalendarEntries(
+    selectedRoomReservations
+  );
 
   const handleChangeRoom = (event) => {
     const roomId = Number(event.target.value);
@@ -68,27 +54,34 @@ export default function RoomsId({ reservations, rooms }) {
   );
 }
 
-export const getServerSideProps = async () => {
-  let reservations;
+export async function getStaticPaths() {
+  const rooms = await fetchRooms();
 
-  await fetchReservations().then(async (data) => {
-    reservations = await data;
-  });
+  const paths = rooms.map((room) => ({
+    params: { id: room.id.toString() },
+  }));
 
-  const rooms = reservations
-    ? uniqBy(
-        reservations.map((reservation) => reservation.room),
-        "id"
-      )
-    : undefined;
+  return { paths, fallback: "blocking" };
+}
 
-  const isLoading = reservations === undefined;
+export async function getStaticProps({ params }) {
+  const reservations = await fetchReservations();
+  const rooms = await fetchRooms();
+
+  if (!rooms.find((room) => room.id.toString() === params.id)) {
+    return {
+      redirect: {
+        destination: `/rooms/${rooms[0].id}`,
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: {
       reservations: reservations,
       rooms: rooms,
-      isLoading: isLoading,
+      id: params.id,
     },
   };
-};
+}

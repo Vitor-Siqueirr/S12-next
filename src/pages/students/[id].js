@@ -1,43 +1,29 @@
 import { filterReservationsByStudent } from "@/domain/filterReservationsByStudent";
 import { Calendar } from "@/ui/components/Calendar";
 import { useRouter } from "next/router";
-import cx from "./Students.module.scss";
-import { fetchReservations } from "@/infrastructure/inner/fetchReservations";
-import { uniqBy } from "lodash";
-import { useEffect } from "react";
+import cx from "@/ui/styles/Reservations.module.scss";
+import {
+  fetchReservations,
+  fetchStudents,
+} from "@/infrastructure/inner/fetchReservations";
+import { mapReservationsToCalendarEntries } from "@/utils/mapReservations";
 
-export default function StudentsId({ reservations, students }) {
+export default function StudentsId({ reservations, students, id }) {
   const router = useRouter();
-  const { id } = router.query;
 
   const selectedStudentId = Number(id);
   const selectedStudent = students.find(
     (student) => student.id === selectedStudentId
   );
 
-  useEffect(() => {
-    if (!selectedStudent) {
-      const firstStudentId = students[0].id;
-      router.push(`/students/${firstStudentId}`);
-    }
-  }, [students, selectedStudent, router]);
-
-  if (!selectedStudent) {
-    return <>Loading...</>;
-  }
-
   const selectedStudentReservations = filterReservationsByStudent(
     reservations,
     selectedStudent
   );
 
-  const entries = selectedStudentReservations.map((reservation) => ({
-    id: reservation.id,
-    title: `${reservation.room.number} - ${reservation.room.name}`,
-    dateStart: reservation.startDate,
-    dateEnd: reservation.endDate,
-    group: reservation.id,
-  }));
+  const studentEntries = mapReservationsToCalendarEntries(
+    selectedStudentReservations
+  );
 
   const handleChangeStudent = (event) => {
     const studentId = Number(event.target.value);
@@ -61,8 +47,8 @@ export default function StudentsId({ reservations, students }) {
 
       <div>
         <Calendar
-          entries={entries}
-          data-value={entries}
+          entries={studentEntries}
+          data-value={studentEntries}
           data-testid="calendar-data"
         />
       </div>
@@ -70,24 +56,34 @@ export default function StudentsId({ reservations, students }) {
   );
 }
 
-export const getServerSideProps = async () => {
-  let reservations;
+export async function getStaticPaths() {
+  const students = await fetchStudents();
 
-  await fetchReservations().then(async (data) => {
-    reservations = await data;
-  });
+  const paths = students.map((student) => ({
+    params: { id: student.id.toString() },
+  }));
 
-  const students = reservations
-    ? uniqBy(
-        reservations.map((reservation) => reservation.student),
-        "id"
-      )
-    : undefined;
+  return { paths, fallback: "blocking" };
+}
+
+export async function getStaticProps({ params }) {
+  const reservations = await fetchReservations();
+  const students = await fetchStudents();
+
+  if (!students.find((student) => student.id.toString() === params.id)) {
+    return {
+      redirect: {
+        destination: `/students/${students[0].id}`,
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: {
       reservations: reservations,
       students: students,
+      id: params.id,
     },
   };
-};
+}

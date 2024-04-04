@@ -10,8 +10,6 @@ export default function Students({ students }) {
     const firstStudentId = students[0].id;
     router.push(`/students/${firstStudentId}`);
   }, [students, router]);
-
-  return <>Loading...</>;
 }
 
 export const getServerSideProps = async () => {

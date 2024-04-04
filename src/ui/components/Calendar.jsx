@@ -3,11 +3,18 @@ import { groupBy, mapValues, range } from "lodash";
 import randomcolor from "randomcolor";
 import { CalendarHeader } from "./CalendarHeader";
 import { CalendarEntry } from "./CalendarEntry";
+import { useEffect, useState } from "react";
 
 export const Calendar = ({ entries, ...rest }) => {
-  const groupColors = mapValues(groupBy(entries, "group"), () =>
-    randomcolor({ luminosity: "light" })
-  );
+  const [groupColors, setGroupColors] = useState({});
+
+  useEffect(() => {
+    setGroupColors(
+      mapValues(groupBy(entries, "group"), () =>
+        randomcolor({ luminosity: "light" })
+      )
+    );
+  }, [entries]);
 
   const headerSpan = 2;
   const daysInAWeek = 7;

@@ -10,8 +10,6 @@ export default function Rooms({ rooms }) {
     const firstRoomId = rooms[0].id;
     router.push(`/rooms/${firstRoomId}`);
   }, [rooms, router]);
-
-  return <>Loading...</>;
 }
 
 export const getServerSideProps = async () => {
